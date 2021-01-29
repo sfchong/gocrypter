@@ -27,10 +27,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"github.com/spf13/cobra"
 	"io"
 	"log"
-
-	"github.com/spf13/cobra"
 )
 
 // encryptCmd represents the encrypt command
@@ -40,7 +39,11 @@ var encryptCmd = &cobra.Command{
 	Long:  `Encrypt a string. This will return an encrypted string and key to decrypt.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		encryptedText, key := encrypt(args[0])
+		encryptedText, key, err := encrypt(args[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		fmt.Println("Encrypted Text:")
 		fmt.Println(encryptedText)
 		fmt.Println("Key to decrypt:")
@@ -52,13 +55,13 @@ func init() {
 	rootCmd.AddCommand(encryptCmd)
 }
 
-func encrypt(inputStr string) (string, string) {
+func encrypt(inputStr string) (string, string, error) {
 	input := []byte(inputStr)
 
 	// Generate random 32 byte key
 	keyBytes := make([]byte, 32)
 	if _, err := rand.Read(keyBytes); err != nil {
-		log.Fatal(err)
+		return "", "", err
 	}
 
 	// Encode key bytes to string
@@ -67,13 +70,13 @@ func encrypt(inputStr string) (string, string) {
 	// Create cipher block from key
 	cipherBlock, err := aes.NewCipher(keyBytes)
 	if err != nil {
-		log.Fatal(err)
+		return "", "", err
 	}
 
 	// Create gcm from cipher block
 	gcm, err := cipher.NewGCM(cipherBlock)
 	if err != nil {
-		log.Fatal(err)
+		return "", "", err
 	}
 
 	// Create nonce
@@ -88,5 +91,5 @@ func encrypt(inputStr string) (string, string) {
 	// Convert encrypted byte to base 16
 	encryptedText := fmt.Sprintf("%x", encryptedByte)
 
-	return encryptedText, key
+	return encryptedText, key, nil
 }
