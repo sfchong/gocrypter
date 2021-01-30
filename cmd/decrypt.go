@@ -22,10 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/hex"
 	"fmt"
+	"github.com/sfchong/gocrypter/pkg"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -37,7 +35,7 @@ var decryptCmd = &cobra.Command{
 	Long:  `Decrypt a string with a key. This will return a decrypted string.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		decryptedText, err := decrypt(args[0], key)
+		decryptedText, err := encrypter.Decrypt(args[0], key)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,43 +50,8 @@ func init() {
 	rootCmd.AddCommand(decryptCmd)
 
 	decryptCmd.Flags().StringVarP(&key, "key", "k", "", "key to decrypt")
-	err := decryptCmd.MarkFlagRequired("key123")
+	err := decryptCmd.MarkFlagRequired("key")
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func decrypt(inputStr string, keyStr string) (string, error) {
-	encryptedByte, err := hex.DecodeString(inputStr)
-	if err != nil {
-		return "", err
-	}
-
-	keyByte, err := hex.DecodeString(keyStr)
-	if err != nil {
-		return "", err
-	}
-
-	// Create cipher block from key
-	cipherBlock, err := aes.NewCipher(keyByte)
-	if err != nil {
-		return "", err
-	}
-
-	// Create gcm from cipher block
-	gcm, err := cipher.NewGCM(cipherBlock)
-	if err != nil {
-		return "", err
-	}
-
-	// Get nonce size
-	nonceSize := gcm.NonceSize()
-
-	// Extract the nonce from the encrypted data
-	nonce, encryptedByte := encryptedByte[:nonceSize], encryptedByte[nonceSize:]
-
-	// Decrypt data
-	decryptedByte, err := gcm.Open(nil, nonce, encryptedByte, nil)
-
-	return string(decryptedByte), nil
 }

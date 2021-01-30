@@ -16,3 +16,6 @@
 
 # Jetbrain ide
 .idea/*
+
+# Build folder
+bin/*

@@ -22,13 +22,9 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
+	"github.com/sfchong/gocrypter/pkg"
 	"github.com/spf13/cobra"
-	"io"
 	"log"
 )
 
@@ -39,7 +35,7 @@ var encryptCmd = &cobra.Command{
 	Long:  `Encrypt a string. This will return an encrypted string and key to decrypt.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		encryptedText, key, err := encrypt(args[0])
+		encryptedText, key, err := encrypter.Encrypt(args[0])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -53,43 +49,4 @@ var encryptCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(encryptCmd)
-}
-
-func encrypt(inputStr string) (string, string, error) {
-	input := []byte(inputStr)
-
-	// Generate random 32 byte key
-	keyBytes := make([]byte, 32)
-	if _, err := rand.Read(keyBytes); err != nil {
-		return "", "", err
-	}
-
-	// Encode key bytes to string
-	key := hex.EncodeToString(keyBytes)
-
-	// Create cipher block from key
-	cipherBlock, err := aes.NewCipher(keyBytes)
-	if err != nil {
-		return "", "", err
-	}
-
-	// Create gcm from cipher block
-	gcm, err := cipher.NewGCM(cipherBlock)
-	if err != nil {
-		return "", "", err
-	}
-
-	// Create nonce
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		fmt.Println(err)
-	}
-
-	// Encrypt data, add nonce as prefix (first nonce argument) to the encrypted data
-	encryptedByte := gcm.Seal(nonce, nonce, input, nil)
-
-	// Convert encrypted byte to base 16
-	encryptedText := fmt.Sprintf("%x", encryptedByte)
-
-	return encryptedText, key, nil
 }
