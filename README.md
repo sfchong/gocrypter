@@ -1,5 +1,5 @@
 # gocrypter
-gocrypter is a simple encrypt/decrypt cli tool using AES encryption written in Golang. It is built with [Cobra](https://github.com/spf13/cobra).
+gocrypter is a simple encrypt/decrypt cli tool using AES encryption written in Go. It is built with [Cobra](https://github.com/spf13/cobra).
 
 ## Overview
 ```
