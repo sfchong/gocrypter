@@ -2,7 +2,7 @@
 gocrypter is a simple encrypt/decrypt cli tool using AES encryption written in Go. It is built with [Cobra](https://github.com/spf13/cobra).
 
 ## Overview
-```
+```console
 $ gocrypter help
 
 Gocrypter is a simple go cli tool that encrypt and decrypt an input string using AES encryption.
@@ -25,12 +25,12 @@ Use "gocrypter [command] --help" for more information about a command.
 
 ## Usage
 ### Encrypt
-```
+```console
 gocrypter encrypt <input>
 ```
 
 Example:
-```
+```console
 $ gocrypter encrypt mysecret
 
 Encrypted Text:
@@ -40,12 +40,12 @@ Key to decrypt:
 ```
 
 ### Decrypt
-```
+```console
 gocrypter decrypt <input> --key <key>
 ```
 
 Example:
-```
+```console
 $ gocrypter decrypt a3455c28fbad4c98755df98608627c9a3ff29cfa2517d2b255fdd17e10014f80dd9f8644 -k 41d38fb61ed911be8510a9de1c111157456597dcfb832363092daa9390ba4c9a
 
 mysecret
